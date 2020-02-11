@@ -12,31 +12,34 @@ using System.Collections.Generic;
 using UnityEngine;
 using Discord;
 
-public class DiscordManager : MonoBehaviour
+namespace DiscordMirror
 {
-    public static DiscordManager instance;
-    private Discord.Discord discord;
-    [SerializeField] bool usePTB;
-    [SerializeField] long clientID;
-    [SerializeField] CreateFlags createFlags;
-    [SerializeField] private DiscordTransport transport;
-
-    private void Awake()
+    public class DiscordManager : MonoBehaviour
     {
-        if (instance == null)
+        public static DiscordManager instance;
+        private Discord.Discord discord;
+        [SerializeField] bool usePTB;
+        [SerializeField] long clientID;
+        [SerializeField] CreateFlags createFlags;
+        [SerializeField] private DiscordTransport transport;
+
+        private void Awake()
         {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-            return;
+            if (instance == null)
+            {
+                instance = this;
+                DontDestroyOnLoad(gameObject);
+                return;
+            }
+
+            Destroy(this);
         }
 
-        Destroy(this);
-    }
-
-    private void Start()
-    {
-        System.Environment.SetEnvironmentVariable("DISCORD_INSTANCE_ID", usePTB ? "1" : "0");
-        discord = new Discord.Discord(clientID, (ulong)createFlags);
-        transport.Initialize(discord);
+        private void Start()
+        {
+            System.Environment.SetEnvironmentVariable("DISCORD_INSTANCE_ID", usePTB ? "1" : "0");
+            discord = new Discord.Discord(clientID, (ulong)createFlags);
+            transport.Initialize(discord);
+        }
     }
 }
