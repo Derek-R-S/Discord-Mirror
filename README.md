@@ -15,6 +15,7 @@ For this to properly work, you do need the following things install into your un
 
 * [Mirror](https://github.com/vis2k/Mirror)
 * [Discord's Game Sdk](https://discordapp.com/developers/docs/game-sdk/sdk-starter-guide)
+* [Latest Discord-Mirror](https://github.com/Derek-R-S/Discord-Mirror/releases)
 
 ## Setting Up
 
@@ -25,7 +26,7 @@ To do this, after setting up your discord client simply call the following, pass
 transport.Initalize(client);
 ```
 
-There is also a testing script you are welcome to use, but its not recommended to use. To use the testing script, put "DiscordManager" on a gameobject in your scene and set up its variables accordingly.
+There is also a testing script you are welcome to use, but its not recommended to use for production. To use the testing script, put "DiscordManager" on a gameobject in your scene and set up its variables accordingly.
 
 ## Connecting
 
@@ -33,7 +34,7 @@ To connect to a server, you need the lobby activity secret. The host can provide
 ```c#
 transport.GetConnectString();
 ```
-The clients can also get the activity secret by matchmaking, but thats something you need to setup.
+The clients can also get the activity secret by matchmaking, but thats something you need to create.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
