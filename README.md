@@ -23,7 +23,7 @@ To use, you need to initialize the discord transport. This sets up the callbacks
 To do this, after setting up your discord client simply call the following, passing the client in the constructor.
 
 ```c#
-transport.Initalize(client);
+((DiscordTransport)Transport.activeTransport).Initialize(client);
 ```
 
 There is also a testing script you are welcome to use, but its not recommended to use for production. To use the testing script, put "DiscordManager" on a gameobject in your scene and set up its variables accordingly.
@@ -32,7 +32,7 @@ There is also a testing script you are welcome to use, but its not recommended t
 
 To connect to a server, you need the lobby activity secret. The host can provide this for you by calling
 ```c#
-transport.GetConnectString();
+((DiscordTransport)Transport.activeTransport).GetConnectString();
 ```
 The clients can also get the activity secret by matchmaking, but thats something you need to create.
 
