@@ -112,7 +112,7 @@ namespace DiscordMirror
 
         public override int GetMaxPacketSize(int channelId = 0)
         {
-            // Don't know if this is correct, or if discord fragments shit. But this should be a safe number to use for now.
+            // Don't know if this is correct, or if discord fragments. But this should be a safe number to use for now.
             return 1200;
         }
 
