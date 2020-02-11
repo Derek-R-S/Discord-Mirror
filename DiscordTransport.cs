@@ -22,16 +22,14 @@ namespace DiscordMirror
         private BiDictionary<long, int> clients;
         private int currentMemberId = 0;
         // Public variables so you can access them from another script and modify them
+        public const string Scheme = "discord";
         public uint serverCapacity = 16;
         public LobbyType lobbyType = LobbyType.Public;
-
-        public void Initialize(Discord.Discord client)
-        {
-            discordClient = client;
-            lobbyManager = discordClient.GetLobbyManager();
-            userManager = discordClient.GetUserManager();
-            SetupCallbacks();
-        }
+        [Tooltip("Connect to the Public Test Build of discord, useful for testing on the same pc.")]
+        public bool usePTB;
+        [Tooltip("This is also know as the \"Client ID\" in your developer dashboard.")]
+        public long discordGameID;
+        public CreateFlags createFlags;
 
         void SetupCallbacks()
         {
@@ -51,22 +49,22 @@ namespace DiscordMirror
             return lobbyManager.GetLobbyActivitySecret(currentLobby.Id);
         }
 
-        private void OnApplicationQuit()
-        {
-            if (discordClient != null)
-                discordClient.Dispose();
-        }
-
         #region Transport Functions
 
-        private void Update()
+        private void Start()
         {
-            if (discordClient != null)
-                discordClient.RunCallbacks();
+            Environment.SetEnvironmentVariable("DISCORD_INSTANCE_ID", usePTB ? "1" : "0");
+            discordClient = new Discord.Discord(discordGameID, (ulong)createFlags);
+            lobbyManager = discordClient.GetLobbyManager();
+            userManager = discordClient.GetUserManager();
+            SetupCallbacks();
         }
 
         private void LateUpdate()
         {
+            if (discordClient != null)
+                discordClient.RunCallbacks();
+
             if (lobbyManager != null)
                 lobbyManager.FlushNetwork();
         }
@@ -193,18 +191,24 @@ namespace DiscordMirror
 
         public override Uri ServerUri()
         {
-            // Don't support URIs.
-            throw new NotImplementedException();
+            UriBuilder builder = new UriBuilder();
+            builder.Scheme = Scheme;
+            builder.Host = GetConnectString();
+            return builder.Uri;
+        }
+
+        public override void ClientConnect(Uri uri)
+        {
+            if (uri.Scheme != Scheme)
+                throw new ArgumentException($"Invalid url {uri}, use {Scheme}://clientid instead", nameof(uri));
+
+            lobbyManager.ConnectLobbyWithActivitySecret(uri.Host, LobbyJoined);
         }
 
         public override void Shutdown()
         {
-            if (currentLobby.Id == 0)
-                return;
-
-            lobbyManager.DisconnectNetwork(currentLobby.Id);
-            lobbyManager.DisconnectLobby(currentLobby.Id, LobbyDisconnected);
-            currentLobby = new Lobby();
+            if (discordClient != null)
+                discordClient.Dispose();
         }
 
         #endregion
