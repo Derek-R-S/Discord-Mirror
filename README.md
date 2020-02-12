@@ -32,9 +32,9 @@ In the Discord application dashboard, you can whitelist people to test your game
 
 ## Connecting
 
-To connect to a server, you need the lobby activity secret. The host can provide this for you by calling
+To connect to a server, you need a connect uri. The host can get it by calling.
 ```c#
-((DiscordTransport)Transport.activeTransport).GetConnectString();
+Transport.activeTransport.ServerUri();
 ```
 The clients can also get the activity secret by matchmaking, but thats something you need to create.
 
