@@ -21,6 +21,7 @@ namespace DiscordMirror
         private Lobby currentLobby;
         private BiDictionary<long, int> clients;
         private int currentMemberId = 0;
+        private bool lobbyCreated = false;
         // Public variables so you can access them from another script and modify them
         public const string Scheme = "discord";
         public uint serverCapacity = 16;
@@ -59,7 +60,7 @@ namespace DiscordMirror
                 discordClient = new Discord.Discord(discordGameID, (ulong)createFlags);
             }catch(ResultException result)
             {
-                Debug.Log("Failed initializing Discord! Reason: " + result.ToString());
+                Debug.LogError("Failed initializing Discord! Reason: " + result.ToString());
                 return;
             }
             lobbyManager = discordClient.GetLobbyManager();
@@ -195,7 +196,18 @@ namespace DiscordMirror
             LobbyTransaction txn = lobbyManager.GetLobbyCreateTransaction();
             txn.SetCapacity(serverCapacity);
             txn.SetType(lobbyType);
+            lobbyCreated = false;
             lobbyManager.CreateLobby(txn, LobbyCreated);
+
+            // Wait until server is actually ready.
+            while (true)
+            {
+                discordClient.RunCallbacks();
+                if (lobbyCreated)
+                    break;
+                System.Threading.Thread.Sleep(100);
+            }
+            lobbyCreated = false;
         }
 
         public override void ServerStop()
@@ -242,6 +254,7 @@ namespace DiscordMirror
         #region Callbacks
         void LobbyCreated(Result result, ref Lobby lobby)
         {
+            lobbyCreated = true;
             switch (result)
             {
                 case (Result.Ok):
@@ -251,6 +264,7 @@ namespace DiscordMirror
                     lobbyManager.OpenNetworkChannel(currentLobby.Id, 1, false);
                     break;
                 default:
+                    OnServerError?.Invoke(0, new Exception("Failed to start discord lobby, Reason: " + result));
                     Debug.LogError("Discord Transport - ERROR: " + result.ToString());
                     break;
             }
