@@ -19,14 +19,16 @@ For this to properly work, you do need the following things install into your un
 
 ## Setting Up
 
-To use, you need to initialize the discord transport. This sets up the callbacks and variables. 
-To do this, after setting up your discord client simply call the following, passing the client in the constructor.
+First, you need an application on Discord. Create one [here](https://discordapp.com/developers/applications) like so:
 
-```c#
-((DiscordTransport)Transport.activeTransport).Initialize(client);
-```
+![Application Process](Applications.PNG)
 
-There is also a testing script you are welcome to use, but its not recommended to use for production. To use the testing script, put "DiscordManager" on a gameobject in your scene and set up its variables accordingly.
+Second, copy the client ID and put that in the transport as Discord Game ID:
+
+![Client ID](ClientID.PNG)
+
+
+In the Discord application dashboard, you can whitelist people to test your game!
 
 ## Connecting
 
