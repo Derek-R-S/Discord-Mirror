@@ -193,16 +193,17 @@ namespace DiscordMirror
         {
             UriBuilder builder = new UriBuilder();
             builder.Scheme = Scheme;
-            builder.Host = GetConnectString();
+            builder.Host = currentLobby.Id.ToString();
+            builder.Query = currentLobby.Secret;
             return builder.Uri;
         }
 
         public override void ClientConnect(Uri uri)
         {
             if (uri.Scheme != Scheme)
-                throw new ArgumentException($"Invalid url {uri}, use {Scheme}://clientid instead", nameof(uri));
+                throw new ArgumentException($"Invalid url {uri}, use {Scheme}://LobbyID/?Secret instead", nameof(uri));
 
-            lobbyManager.ConnectLobbyWithActivitySecret(uri.Host, LobbyJoined);
+            lobbyManager.ConnectLobbyWithActivitySecret(string.Format("{0}:{1}", uri.Host, uri.Query.Replace("?", "")), LobbyJoined);
         }
 
         public override void Shutdown()
