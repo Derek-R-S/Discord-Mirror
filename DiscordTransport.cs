@@ -54,7 +54,14 @@ namespace DiscordMirror
         private void Awake()
         {
             Environment.SetEnvironmentVariable("DISCORD_INSTANCE_ID", usePTB ? "1" : "0");
-            discordClient = new Discord.Discord(discordGameID, (ulong)createFlags);
+            try
+            {
+                discordClient = new Discord.Discord(discordGameID, (ulong)createFlags);
+            }catch(ResultException result)
+            {
+                Debug.Log("Failed initializing Discord! Reason: " + result.ToString());
+                return;
+            }
             lobbyManager = discordClient.GetLobbyManager();
             userManager = discordClient.GetUserManager();
             SetupCallbacks();
