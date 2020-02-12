@@ -26,7 +26,7 @@ First, you need an application on Discord. Create one [here](https://discordapp.
 Second, copy the client ID and put that in the transport as Discord Game ID:
 
 ![Client ID](ClientID.PNG)
-
+![Transport Pic](Transport.PNG)
 
 In the Discord application dashboard, you can whitelist people to test your game!
 
