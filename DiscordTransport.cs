@@ -51,7 +51,7 @@ namespace DiscordMirror
 
         #region Transport Functions
 
-        private void Start()
+        private void Awake()
         {
             Environment.SetEnvironmentVariable("DISCORD_INSTANCE_ID", usePTB ? "1" : "0");
             discordClient = new Discord.Discord(discordGameID, (ulong)createFlags);
@@ -77,6 +77,12 @@ namespace DiscordMirror
 
         public override void ClientConnect(string address)
         {
+            if (discordClient == null || lobbyManager == null)
+            {
+                Debug.Log("Cannot create server as discord is not initialized!");
+                return;
+            }
+
             lobbyManager.ConnectLobbyWithActivitySecret(address, LobbyJoined);
         }
 
@@ -171,6 +177,12 @@ namespace DiscordMirror
                 return;
             }
 
+            if(discordClient == null || lobbyManager == null)
+            {
+                Debug.Log("Cannot create server as discord is not initialized!");
+                return;
+            }
+
             clients = new BiDictionary<long, int>();
             currentMemberId = 1;
             LobbyTransaction txn = lobbyManager.GetLobbyCreateTransaction();
@@ -202,6 +214,12 @@ namespace DiscordMirror
         {
             if (uri.Scheme != Scheme)
                 throw new ArgumentException($"Invalid url {uri}, use {Scheme}://LobbyID/?Secret instead", nameof(uri));
+
+            if (discordClient == null || lobbyManager == null)
+            {
+                Debug.Log("Cannot create server as discord is not initialized!");
+                return;
+            }
 
             lobbyManager.ConnectLobbyWithActivitySecret(string.Format("{0}:{1}", uri.Host, uri.Query.Replace("?", "")), LobbyJoined);
         }
