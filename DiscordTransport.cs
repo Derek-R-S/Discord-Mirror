@@ -15,7 +15,7 @@ namespace DiscordMirror
 {
     public class DiscordTransport : Transport
     {
-        private Discord.Discord discordClient;
+        public Discord.Discord discordClient { get; private set; }
         private Discord.LobbyManager lobbyManager;
         private Discord.UserManager userManager;
         private Lobby currentLobby;
@@ -219,7 +219,11 @@ namespace DiscordMirror
             lobbyManager.DisconnectLobby(currentLobby.Id, LobbyDisconnected);
             currentLobby = new Lobby();
         }
-
+        public override void OnApplicationQuit()
+        {
+            ServerStop();
+            base.OnApplicationQuit();
+        }
         public override Uri ServerUri()
         {
             UriBuilder builder = new UriBuilder();
