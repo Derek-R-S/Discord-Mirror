@@ -11,7 +11,7 @@ The point of this is for if you plan on releasing your game on Discord. This als
 
 ## Prerequisites
 
-For this to properly work, you do need the following things install into your unity project.
+For this to properly work, you do need the following things install into your unity project, The releases already have everything in them so if you prefer it all setup for you then grab a release.
 
 * [Mirror](https://github.com/vis2k/Mirror)
 * [Discord's Game Sdk](https://discordapp.com/developers/docs/game-sdk/sdk-starter-guide)
@@ -37,6 +37,8 @@ To connect to a server, you need a connect uri. The host can get it by calling.
 Transport.activeTransport.ServerUri();
 ```
 The clients can also get the activity secret by matchmaking, but thats something you need to create.
+
+If you prefer to use regular secrets, you can set the activity secret and join by setting the NetworkManager address to the secret and call NetworkManager.StartClient()
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
