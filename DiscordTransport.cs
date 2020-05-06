@@ -1,7 +1,5 @@
 ﻿/*
-
     GITHUB: https://github.com/Derek-R-S
-
 */
 
 using System.Collections;
@@ -18,10 +16,11 @@ namespace DiscordMirror
         public Discord.Discord discordClient { get; private set; }
         private Discord.LobbyManager lobbyManager;
         private Discord.UserManager userManager;
-        private Lobby currentLobby;
+        public Lobby currentLobby;
         private BiDictionary<long, int> clients;
         private int currentMemberId = 0;
         private bool lobbyCreated = false;
+        private bool canReconnect = true;
         // Public variables so you can access them from another script and modify them
         public const string Scheme = "discord";
         public uint serverCapacity = 16;
@@ -58,7 +57,8 @@ namespace DiscordMirror
             try
             {
                 discordClient = new Discord.Discord(discordGameID, (ulong)createFlags);
-            }catch(ResultException result)
+            }
+            catch (ResultException result)
             {
                 Debug.LogError("Failed initializing Discord! Reason: " + result.ToString());
                 return;
@@ -67,7 +67,7 @@ namespace DiscordMirror
             userManager = discordClient.GetUserManager();
             SetupCallbacks();
         }
-
+		
         private void LateUpdate()
         {
             if (discordClient != null)
@@ -91,6 +91,12 @@ namespace DiscordMirror
                 return;
             }
 
+            if (!canReconnect)
+            {
+                Debug.Log("Already connecting...");
+                return;
+            }
+            canReconnect = false;
             lobbyManager.ConnectLobbyWithActivitySecret(address, LobbyJoined);
         }
 
@@ -185,7 +191,7 @@ namespace DiscordMirror
                 return;
             }
 
-            if(discordClient == null || lobbyManager == null)
+            if (discordClient == null || lobbyManager == null)
             {
                 Debug.Log("Cannot create server as discord is not initialized!");
                 return;
@@ -244,6 +250,13 @@ namespace DiscordMirror
                 return;
             }
 
+            if (!canReconnect)
+            {
+                Debug.Log("Already connecting...");
+                return;
+            }
+            canReconnect = false;
+
             lobbyManager.ConnectLobbyWithActivitySecret(string.Format("{0}:{1}", uri.Host, uri.Query.Replace("?", "")), LobbyJoined);
         }
 
@@ -267,6 +280,9 @@ namespace DiscordMirror
                     lobbyManager.OpenNetworkChannel(currentLobby.Id, 0, true);
                     lobbyManager.OpenNetworkChannel(currentLobby.Id, 1, false);
                     break;
+                case Result.InvalidCommand:
+                    Debug.LogError("Already Connected?");
+                    break;
                 default:
                     OnServerError?.Invoke(0, new Exception("Failed to start discord lobby, Reason: " + result));
                     Debug.LogError("Discord Transport - ERROR: " + result.ToString());
@@ -276,6 +292,7 @@ namespace DiscordMirror
 
         void LobbyJoined(Result result, ref Lobby lobby)
         {
+            canReconnect = true;
             switch (result)
             {
                 case (Result.Ok):
@@ -284,6 +301,9 @@ namespace DiscordMirror
                     lobbyManager.OpenNetworkChannel(currentLobby.Id, 0, true);
                     lobbyManager.OpenNetworkChannel(currentLobby.Id, 1, false);
                     OnClientConnected?.Invoke();
+                    break;
+                case Result.InvalidCommand:
+                    Debug.LogError("Already Connected?");
                     break;
                 default:
                     Debug.LogError("Discord Transport - ERROR: " + result.ToString());
